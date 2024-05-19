@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    display: block;
+    justify-content: center;
+    align-items: center;
+
+    background-image: url(background1.jpg);
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: 0;
+    background-size: cover;
+}
+
+h1 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rgb(7, 124, 42);
+    text-shadow: -3px -3px 1px rgb(142, 233, 191);
+    text-align: center;
+    margin: 0;
+}
+
+textarea {
+    background-color: rgb(233, 227, 219);
+    background-image: url(background8.jpg);
+}
+
+.container-lg {
+    background-image: url(background8.jpg);
+    height: auto;
+    width: 50%;
+
+    padding: 20px;
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#test-text {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+#user-input {
+    width: 100%;
+    font-size: 18px;
+}
+
+#start-button {
+    margin-top: 10px;
+}
+
+#results {
+    margin-top: 20px;
+    font-size: 18px;
+}
