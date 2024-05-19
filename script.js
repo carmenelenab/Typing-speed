@@ -102,7 +102,7 @@ function checkInput() {
     const targetWordMap = {};
     for (const word of targetWords) {
         if (targetWordMap[word]) {
-            targetWordMap[word]++;
+            ++targetWordMap[word];
         } else {
             targetWordMap[word] = 1;
         }
@@ -111,8 +111,8 @@ function checkInput() {
     // Count correct words based on the map
     for (const word of typedWords) {
         if (targetWordMap[word]) {
-            correctWordsCount++;
-            targetWordMap[word]--; // Decrement the count in the map
+            ++correctWordsCount;
+            --targetWordMap[word]; // Decrement the count in the map
         }
     }
 
