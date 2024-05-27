@@ -6,7 +6,10 @@ const startButton = document.getElementById('start-button');
 const resultsElement = document.getElementById('results');
 const timerElement = document.getElementById('timer');
 
-//This array holds multiple sample texts from which one will be randomly selected for the typing test
+const ONE_SECOND_INTERVAL = 1000;
+const PERCENTAGE = 100;
+const TIMER_INTERVAL = 60;
+
 const testTexts = [
     `Lulu was out for her usual morning walk when she took a wrong turn and 
     found herself in the woods. She tried to retrace her steps, but soon 
@@ -17,7 +20,7 @@ const testTexts = [
     it was the most beautiful car he had ever seen.`,
     `For many people, birds are simply beings that exist outside their 
     windows or that they might see on a nature hike. However, for 
-    birdwatchers, these creatures are a source of never - ending fascination. 
+    birdwatchers, these creatures are a source of never-ending fascination. 
     Bird watching can be a relaxing hobby or a lifelong passion, and it offers 
     a unique opportunity to connect with nature. Each time you go bird
     watching, you have the chance to encounter new species and learn 
@@ -30,7 +33,7 @@ const testTexts = [
     to recognize the individual sounds that make up words, a skill known as
     phonemic awareness.`,
     `The young boy took it for a spin around the block, feeling like the 
-    luckiest kid in the world. Even though it was just an old rust - bucket,
+    luckiest kid in the world. Even though it was just an old rust-bucket,
     to him it was the most special car in the world.`
 ];
 
@@ -38,8 +41,8 @@ let startTime;
 let timer;
 let correctWordsCount = 0;
 
-//This function initializes the test by selecting a random text, resetting the input
-// field, and starting the timer and input listener
+// This function initializes the test by selecting a random text, 
+//resetting the input field, and starting the timer and input listener
 function startTest() {
     const randomText = testTexts[Math.floor(Math.random() * testTexts.length)];
     testTextElement.textContent = randomText;
@@ -53,10 +56,10 @@ function startTest() {
     userInputElement.removeEventListener('input', checkInput);
     userInputElement.addEventListener('input', checkInput);
 
-    startTimer(60);// Start the timer for 1 minute
+    startTimer(TIMER_INTERVAL);
 }
 
-//This function manages the countdown timer and updates the timer 
+// This function manages the countdown timer and updates the timer 
 //element every second.
 function startTimer(duration) {
     let timeRemaining = duration;
@@ -69,64 +72,68 @@ function startTimer(duration) {
             clearInterval(timer);
             finishTest();
         }
-    }, 1000);
+    }, ONE_SECOND_INTERVAL);
 }
 
-//This function compares the user input with the target text in real-time, 
-//updates the test text to show correct and incorrect characters in different colors, 
-//and counts the number of correctly typed words.
+// This function compares the user input with the target text in real-time,
+// updates the test text to show correct and incorrect characters in different
+// colors, and counts the number of correctly typed words.
 function checkInput() {
     const typedText = userInputElement.value;
     const targetText = testTextElement.textContent;
     let formattedText = '';
 
-    for (let i = 0; i < targetText.length; ++i) {
-        if (i < typedText.length) {
-            if (typedText[i] === targetText[i]) {
-                formattedText += `<span style="color: green;">${targetText[i]}</span>`;
-            } else {
-                formattedText += `<span style="color: red;">${targetText[i]}</span>`;
-            }
-        } else {
-            formattedText += `<span>${targetText[i]}</span>`;
-        }
-    }
-
-    testTextElement.innerHTML = formattedText;
-
     const typedWords = typedText.trim().split(/\s+/);
     const targetWords = targetText.trim().split(/\s+/);
-    correctWordsCount = 0;
+    correctWordsCount = countMatches(typedWords, targetWords);
 
-    // Use a map to track the frequency of each word in the target text
-    const targetWordMap = {};
-    for (const word of targetWords) {
-        if (targetWordMap[word]) {
-            ++targetWordMap[word];
+    // Reconstruct the target text with colored spans for correct and incorrect letters
+    for (let i = 0; i < targetWords.length; ++i) {
+        if (i < typedWords.length) {
+            let formattedWord = '';
+            const targetWord = targetWords[i];
+            const typedWord = typedWords[i];
+
+            for (let j = 0; j < targetWord.length; ++j) {
+                if (j < typedWord.length) {
+                    if (typedWord[j] === targetWord[j]) {
+                        formattedWord += `<span style="color: green;">${targetWord[j]}</span>`;
+                    } else {
+                        formattedWord += `<span style="color: red;">${targetWord[j]}</span>`;
+                    }
+                } else {
+                    formattedWord += `<span style="color: red;">${targetWord[j]}</span>`;
+                }
+            }
+            formattedText += formattedWord + ' ';
         } else {
-            targetWordMap[word] = 1;
+            formattedText += `<span>${targetWords[i]}</span> `;
         }
     }
 
-    // Count correct words based on the map
-    for (const word of typedWords) {
-        if (targetWordMap[word]) {
-            ++correctWordsCount;
-            --targetWordMap[word]; // Decrement the count in the map
-        }
-    }
+    testTextElement.innerHTML = formattedText.trim();
 
     if (typedText === targetText) {
         finishTest();
     }
 }
 
-//This function stops the timer, calculates the time taken and accuracy, 
+function countMatches(typedWords, targetWords) {
+    let count = 0;
+    for (let i = 0; i < targetWords.length; ++i) {
+        if (typedWords[i] === targetWords[i]) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+// This function stops the timer, calculates the time taken and accuracy, 
 //and displays the results.
 function finishTest() {
     clearInterval(timer);
     const endTime = new Date().getTime();
-    const timeTaken = (endTime - startTime) / 1000;
+    const timeTaken = (endTime - startTime) / ONE_SECOND_INTERVAL;
     const typedText = userInputElement.value;
     const targetText = testTextElement.textContent;
     const accuracy = calculateAccuracy(typedText, targetText);
@@ -139,21 +146,19 @@ function finishTest() {
     userInputElement.disabled = true;
 }
 
-//This function calculates the accuracy of the typed text based on the number 
-//of correctly typed words compared to the target text.
+// This function calculates the accuracy of the typed text based on the number of correctly typed words compared to the target text.
 function calculateAccuracy(typed, target) {
-    const typedChars = typed.split(/\s+/);
-    const targetChars = target.split(/\s+/);
-    let correctChars = 0;
+    const typedWords = typed.trim().split(/\s+/);
+    const targetWords = target.trim().split(/\s+/);
+    let correctWords = 0;
 
-    typedChars.forEach((char, index) => {
-        if (char === targetChars[index]) {
-            ++correctChars;
+    for (let i = 0; i < targetWords.length; ++i) {
+        if (typedWords[i] === targetWords[i]) {
+            ++correctWords;
         }
-    });
-    return (correctChars / targetChars.length) * 100;
+    }
+
+    return (correctWords / targetWords.length) * PERCENTAGE;
 }
 
-//This line adds a click event listener to the start button, 
-//triggering the startTest function when clicked.
 startButton.addEventListener('click', startTest);
