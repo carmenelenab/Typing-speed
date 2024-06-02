@@ -6,6 +6,9 @@ const startButton = document.getElementById('start-button');
 const resultsElement = document.getElementById('results');
 const timerElement = document.getElementById('timer');
 
+const GREEN = (char) => `<span style="color: green;">${char}</span>`;
+const RED = (char) => `<span style="color: red;">${char}</span>`;
+
 const ONE_SECOND_INTERVAL = 1000;
 const PERCENTAGE = 100;
 const TIMER_INTERVAL = 60;
@@ -87,7 +90,8 @@ function checkInput() {
     const targetWords = targetText.trim().split(/\s+/);
     correctWordsCount = countMatches(typedWords, targetWords);
 
-    // Reconstruct the target text with colored spans for correct and incorrect letters
+    // Reconstruct the target text with colored spans 
+    //for correct and incorrect letters
     for (let i = 0; i < targetWords.length; ++i) {
         if (i < typedWords.length) {
             let formattedWord = '';
@@ -97,12 +101,12 @@ function checkInput() {
             for (let j = 0; j < targetWord.length; ++j) {
                 if (j < typedWord.length) {
                     if (typedWord[j] === targetWord[j]) {
-                        formattedWord += `<span style="color: green;">${targetWord[j]}</span>`;
+                        formattedWord += GREEN(targetWord[j]);
                     } else {
-                        formattedWord += `<span style="color: red;">${targetWord[j]}</span>`;
+                        formattedWord += RED(targetWord[j]);
                     }
                 } else {
-                    formattedWord += `<span style="color: red;">${targetWord[j]}</span>`;
+                    formattedWord += RED(targetWord[j]);
                 }
             }
             formattedText += formattedWord + ' ';
@@ -146,7 +150,8 @@ function finishTest() {
     userInputElement.disabled = true;
 }
 
-// This function calculates the accuracy of the typed text based on the number of correctly typed words compared to the target text.
+// This function calculates the accuracy of the typed text based on the 
+//number of correctly typed words compared to the target text.
 function calculateAccuracy(typed, target) {
     const typedWords = typed.trim().split(/\s+/);
     const targetWords = target.trim().split(/\s+/);
